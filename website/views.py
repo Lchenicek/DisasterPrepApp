@@ -1,11 +1,13 @@
 import os
 import time
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils.translation import gettext as _
 from django.utils.safestring import mark_safe
 from .models import Users
+import pdfkit
 import requests
 import bleach
 import math
@@ -23,6 +25,14 @@ def sanitize_html(content):
 
 APIKey = "5b3ce3597851110001cf6248f1495139fccf4eb9a4494f7bddb5a976"
 from .utils import checklist_image
+
+def generate_image(request):
+    html_content = render_to_string('disasterposter.html', {'context': 'data'})
+    config = pdfkit.configuration(wkhtmltoimage='/static/images/disaster_poster.png')
+    img_data = pdfkit.from_string(html_content, False, configuration=config, options={'format': 'png'})
+    response = HttpResponse(img_data, content_type='image/png')
+    response['Content-Disposition'] = 'attachment; filename="poster.png"'
+    return response
 
 def home(request):
     context = {
