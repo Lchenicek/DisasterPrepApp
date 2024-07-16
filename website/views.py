@@ -7,7 +7,8 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from django.utils.safestring import mark_safe
 from .models import Users
-import pdfkit
+from django.db import models
+import imgkit
 import requests
 import bleach
 import math
@@ -27,11 +28,31 @@ APIKey = "5b3ce3597851110001cf6248f1495139fccf4eb9a4494f7bddb5a976"
 from .utils import checklist_image
 
 def generate_image(request):
-    html_content = render_to_string('disasterposter.html', {'context': 'data'})
-    config = pdfkit.configuration(wkhtmltoimage='/static/images/disaster_poster.png')
-    img_data = pdfkit.from_string(html_content, False, configuration=config, options={'format': 'png'})
+    html_content = render_to_string('disasterposter.html', {
+
+        # What the hell is going on?
+        
+        'context': 'data',
+        'image_url': '/static/disaster-poster.png',  # Ensure these values are correct and available
+        'geoJSON': models.TextField(),
+        'center_lat': models.FloatField(),
+        'center_log': models.FloatField(),
+        'user_lat': models.FloatField(),
+        'user_log': models.FloatField(),
+        'shelter_lat': models.FloatField(),
+        'shelter_log': models.FloatField()
+    })
+
+    # Ensure the path to wkhtmltoimage is correctly set
+    config = imgkit.config(wkhtmltoimage='/usr/local/bin/wkhtmltoimage')
+
+    # Convert HTML content to image
+    img_data = imgkit.from_string(html_content, False, config=config, options={'format': 'png'})
+
+    # Create a response with the image data
     response = HttpResponse(img_data, content_type='image/png')
-    response['Content-Disposition'] = 'attachment; filename="poster.png"'
+    response['Content-Disposition'] = 'attachment; filename="dissyposter.png"'
+
     return response
 
 def home(request):

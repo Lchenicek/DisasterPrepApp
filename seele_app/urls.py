@@ -33,6 +33,7 @@ urlpatterns = [
     path('disasterposter/', disasterposter, name="disasterposter"),
     path('disasterposter/<int:user_id>/', disasterposter, name="disasterposter"),
     path('download/', download_poster, name='download_poster'),
+    path('generate_image/', generate_image, name='generate_image'),
     path('logout/',logout,name="logout"),
 ]
 
